@@ -5,15 +5,8 @@ import os
 from util import extract_themes_gpt, get_semantic_chunks, boost_by_tag, build_context, classify_question_spirituality, ai_refine_text
 import pinecone
 import openai
-import re
-import nltk
-try:
-    from nltk.corpus import words
-    word_set = set(words.words())
-except LookupError:
-    nltk.download('words')
-    from nltk.corpus import words
-    word_set = set(words.words())
+
+
 
 # Load environment variables from root .env file
 env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
@@ -33,29 +26,6 @@ pc = pinecone.Pinecone(api_key=PINECONE_API_KEY)
 books_index = pc.Index(PINECONE_INDEX_NAME)
 hadiths_index = pc.Index(PINECONE_HADITHS_INDEX_NAME)
 
-def smart_split(text):
-    def split_word(w):
-        for i in range(2, len(w)-2):
-            left, right = w[:i], w[i:]
-            if left in word_set and right in word_set and w not in word_set:
-                return left + ' ' + right
-        return w
-    return ' '.join([split_word(word) for word in text.split()])
-
-def clean_english_text(text):
-    if not text:
-        return text
-    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
-    text = re.sub(r'([.,;:!?])([A-Za-z])', r'\1 \2', text)
-    text = re.sub(r'\s+', ' ', text)
-    # Custom stuck word fixes
-    text = text.replace('wasnarrated', 'was narrated')
-    text = text.replace('andseewhether', 'and see whether')
-    text = text.replace('thenall', 'then all')
-    text = text.replace('hisdeds', 'his deeds')
-    # ...add more as you find them
-    text = smart_split(text)
-    return text.strip()
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
