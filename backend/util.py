@@ -1,31 +1,4 @@
 import re
-import nltk
-from nltk.corpus import words
-
-word_set = set(words.words())
-
-def smart_split(text):
-    def split_word(w):
-        for i in range(2, len(w)-2):
-            left, right = w[:i], w[i:]
-            if left in word_set and right in word_set and w not in word_set:
-                return left + ' ' + right
-        return w
-    return ' '.join([split_word(word) for word in text.split()])
-
-def clean_english_text(text):
-    if not text:
-        return text
-    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
-    text = re.sub(r'([.,;:!?])([A-Za-z])', r'\1 \2', text)
-    text = re.sub(r'\s+', ' ', text)
-    # Custom stuck word fixes
-    text = text.replace('wasnarrated', 'was narrated')
-    text = text.replace('andseewhether', 'and see whether')
-    text = text.replace('thenall', 'then all')
-    text = text.replace('hisdeds', 'his deeds')
-    # ...add more as you find them
-    return text.strip()
 
 def extract_themes_gpt(query, openai, max_tags=3):
     prompt = (
