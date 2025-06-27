@@ -15,7 +15,7 @@ interface HadithDetail {
 
 async function getHadith(id: string): Promise<HadithDetail | null> {
   try {
-    const res = await fetch(`http://localhost:5000/api/hadith/${id}`, { cache: 'no-store' });
+    const res = await fetch(`https://tazkiyah-ai.onrender.com/api/hadith/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch {
