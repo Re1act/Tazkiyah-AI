@@ -6,8 +6,6 @@ from util import extract_themes_gpt, get_semantic_chunks, boost_by_tag, build_co
 import pinecone
 import openai
 
-
-
 # Load environment variables from root .env file
 env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
 load_dotenv(env_path)
@@ -73,7 +71,7 @@ def chat():
         
         # Generate answer
         system_prompt = (
-            "You are a spiritual and mental health assistant grounded in Islamic tradition. The following CONTEXT is drawn from classical Tazkiyah texts and is provided to help you answer the user's question. The user did NOT write the context. If you don't know, say so and do NOT hallucinate."
+            "You are a spiritual and mental health assistant grounded in Islamic tradition. The following CONTEXT is drawn from classical Tazkiyah texts and is provided to help you answer the user's question. The user did NOT write the context. If you don't know how to answer the question, say so and do NOT hallucinate."
         )
         messages = [
             {"role": "system", "content": system_prompt},
@@ -92,7 +90,10 @@ def chat():
                 if hasattr(delta, 'content') and delta.content:
                     yield delta.content
             if sources:
-                yield f"\n\n**Sources:**\n" + "\n".join(f"- {src}" for src in sources)
+                def slug_to_title(slug):
+                    return ' '.join(word.capitalize() for word in slug.replace('-', ' ').split())
+                formatted_sources = [slug_to_title(src) for src in sources]
+                yield f"\n\n**Sources:**\n" + "\n".join(f"- {src}" for src in formatted_sources)
         return Response(stream_with_context(generate_spiritual()), mimetype='text/plain')
     except Exception as e:
         return jsonify({'error': str(e)}), 500

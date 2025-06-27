@@ -89,7 +89,6 @@ def classify_question_spirituality(question, openai):
         max_tokens=10,
         temperature=0
     )
-    import re
     label = response.choices[0].message.content.strip().lower()
     label = re.sub(r'[^a-z]', '', label)  # Remove non-letter characters
     return label == 'spiritual'
